@@ -1,0 +1,67 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class EbayAutomationScript {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver(); // Set the appropriate WebDriver for your browser
+
+        // Scenario 1: Access a Product via category after applying multiple filters
+        // Go to www.ebay.com
+        driver.get("https://www.ebay.com");
+
+        // Navigate to Search by category > Electronics > Cell Phones & accessories
+        WebElement searchCategory = driver.findElement(By.id("gh-cat"));
+        searchCategory.sendKeys("Electronics");
+        driver.findElement(By.id("gh-btn")).click();
+
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Cell Phones & Smartphones"))).click();
+
+        // Click "See All" under "Shop by brand" or "Shop by Network"
+        wait.until(ExpectedConditions.elementToBeClickable(By.linkText("See All"))).click();
+
+        // Add filters - screen size, Price, and Item location
+        wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Screen Size"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Price"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Item Location"))).click();
+
+        // Click Apply
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[text()='Apply']"))).click();
+
+        // Verify that the filter tags are applied
+        int tagCount = driver.findElements(By.className("tag")).size();
+        assert tagCount == 3 : "Filters were not applied correctly";
+
+        driver.quit();
+
+        // Scenario 2: Access a Product via Search
+        driver = new ChromeDriver(); // Set the appropriate WebDriver for your browser
+
+        // Go to www.ebay.com
+        driver.get("https://www.ebay.com");
+
+        // Type any search string in the search bar
+        WebElement searchBar = driver.findElement(By.id("gh-ac"));
+        searchBar.sendKeys("MacBook");
+
+        // Change the Search category
+        WebElement searchCategory = driver.findElement(By.id("gh-cat"));
+        searchCategory.sendKeys("Computers/Tablets & Networking");
+
+        // Click Search
+        driver.findElement(By.id("gh-btn")).click();
+
+        // Verify that the page loads completely
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h1[text()='Computers, Tablets & Network Hardware']")));
+
+        // Verify that the first result name matches with the search string
+        String firstResult = driver.findElement(By.xpath("(//h3[@class='s-item__title'])[1]")).getText();
+        assert firstResult.contains("MacBook") : "First result name does not match the search string";
+
+        driver.quit();
+    }
+}

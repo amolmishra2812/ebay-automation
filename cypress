@@ -1,0 +1,47 @@
+describe("Ebay Automation", () => {
+  it("Scenario 1: Access a Product via category after applying multiple filters", () => {
+    cy.visit("https://www.ebay.com");
+
+    // Navigate to Search by category > Electronics > Cell Phones & accessories
+    cy.get("#gh-cat").select("Electronics");
+    cy.get("#gh-btn").click();
+
+    cy.contains("Cell Phones & Smartphones").click();
+
+    // Click "See All" under "Shop by brand" or "Shop by Network"
+    cy.contains("See All").click();
+
+    // Add filters - screen size, Price, and Item location
+    cy.contains("Screen Size").click();
+    cy.contains("Price").click();
+    cy.contains("Item Location").click();
+
+    // Click Apply
+    cy.contains("Apply").click();
+
+    // Verify that the filter tags are applied
+    cy.get(".tag").should("have.length", 3);
+  });
+
+  it("Scenario 2: Access a Product via Search", () => {
+    cy.visit("https://www.ebay.com");
+
+    // Type any search string in the search bar
+    cy.get("#gh-ac").type("MacBook");
+
+    // Change the Search category
+    cy.get("#gh-cat").select("Computers/Tablets & Networking");
+
+    // Click Search
+    cy.get("#gh-btn").click();
+
+    // Verify that the page loads completely
+    cy.contains("Computers, Tablets & Network Hardware");
+
+    // Verify that the first result name matches with the search string
+    cy.get(".s-item__title")
+      .first()
+      .invoke("text")
+      .should("contain", "MacBook");
+  });
+});
